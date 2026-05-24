@@ -1,0 +1,2583 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milchbar Pinguin · Eiscafé · Bar · Restaurant · Leipzig</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============ RESET & BASE ============ */
+  *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #faf6f0;
+    color: #2a1810;
+    overflow-x: hidden;
+    line-height: 1.6;
+    cursor: none;
+  }
+  @media (max-width: 900px) { body { cursor: auto; } }
+
+  ::selection { background: #c8102e; color: #fff; }
+
+  /* ============ COLOR TOKENS ============ */
+  :root {
+    --red: #c8102e;
+    --red-deep: #8b0a1f;
+    --cream: #faf6f0;
+    --warm: #f1e9dc;
+    --dark: #2a1810;
+    --gold: #d4a574;
+    --soft-pink: #fce4e7;
+    --glass: rgba(255, 255, 255, 0.55);
+    --glass-strong: rgba(255, 255, 255, 0.75);
+    --glass-dark: rgba(42, 24, 16, 0.4);
+    --border-glass: rgba(255, 255, 255, 0.4);
+    --shadow-soft: 0 8px 32px rgba(42, 24, 16, 0.08);
+    --shadow-strong: 0 20px 60px rgba(42, 24, 16, 0.18);
+  }
+
+  /* ============ CUSTOM CURSOR ============ */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--red);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transition: transform 0.15s ease, width 0.3s, height 0.3s;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--red);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s, height 0.3s, opacity 0.3s;
+    transform: translate(-50%, -50%);
+    opacity: 0.6;
+  }
+  .cursor.hover { transform: translate(-50%, -50%) scale(0.5); }
+  .cursor-ring.hover { width: 60px; height: 60px; opacity: 1; }
+
+  /* ============ LOADER ============ */
+  .loader {
+    position: fixed; inset: 0;
+    background: var(--cream);
+    z-index: 10000;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.8s, visibility 0.8s;
+  }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-penguin { animation: bounce 1.2s ease-in-out infinite; }
+  .loader-text {
+    font-family: 'Caveat', cursive;
+    font-size: 2rem; margin-top: 1rem;
+    color: var(--red);
+    letter-spacing: 1px;
+  }
+  .loader-bar {
+    width: 200px; height: 2px;
+    background: rgba(200, 16, 46, 0.15);
+    margin-top: 1.5rem; overflow: hidden; border-radius: 2px;
+  }
+  .loader-bar::after {
+    content: ''; display: block; width: 30%; height: 100%;
+    background: var(--red);
+    animation: load 1.5s ease-in-out infinite;
+  }
+  @keyframes load { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+  /* ============ NAVIGATION ============ */
+  nav {
+    position: fixed;
+    top: 1.5rem; left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    padding: 0.8rem 2rem;
+    background: var(--glass);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--border-glass);
+    border-radius: 100px;
+    box-shadow: var(--shadow-soft);
+    display: flex; align-items: center; gap: 2.5rem;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  nav.scrolled {
+    background: var(--glass-strong);
+    box-shadow: var(--shadow-strong);
+    padding: 0.6rem 1.8rem;
+  }
+  .nav-logo {
+    font-family: 'Caveat', cursive;
+    font-size: 1.6rem; color: var(--red);
+    font-weight: 700;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .nav-logo svg { width: 30px; height: 30px; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--dark);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    position: relative;
+    transition: color 0.3s;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1.5px;
+    background: var(--red);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--red); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    background: var(--red); color: white !important;
+    padding: 0.5rem 1.2rem; border-radius: 100px;
+    transition: all 0.3s !important;
+  }
+  .nav-cta::after { display: none !important; }
+  .nav-cta:hover { background: var(--red-deep); transform: translateY(-2px); }
+
+  /* Language toggle */
+  .lang-toggle {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--border-glass);
+    border-radius: 100px;
+    padding: 3px;
+    gap: 2px;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+  }
+  .lang-toggle button {
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: rgba(42, 24, 16, 0.55);
+    padding: 0.35rem 0.75rem;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .lang-toggle button.active {
+    background: var(--red);
+    color: white;
+    box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
+  }
+  .lang-toggle button:not(.active):hover { color: var(--red); }
+
+  @media (max-width: 900px) {
+    nav { padding: 0.6rem 1rem; gap: 1rem; }
+    .nav-links { display: none; }
+    .nav-cta { display: block; }
+    .lang-toggle button { font-size: 0.65rem; padding: 0.3rem 0.6rem; }
+  }
+
+  /* ============ HERO ============ */
+  .hero {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center;
+    background: radial-gradient(ellipse at top, #fce4e7 0%, #faf6f0 50%, #f1e9dc 100%);
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(200, 16, 46, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(212, 165, 116, 0.12) 0%, transparent 40%);
+    pointer-events: none;
+  }
+  .hero-grid {
+    width: 100%;
+    max-width: 1400px; margin: 0 auto;
+    padding: 8rem 3rem 4rem;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 4rem; align-items: center;
+    position: relative;
+  }
+  @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; padding: 7rem 1.5rem 3rem; gap: 2rem; } }
+
+  .hero-tagline {
+    display: inline-flex; align-items: center; gap: 0.7rem;
+    padding: 0.5rem 1.2rem;
+    background: var(--glass-strong);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glass);
+    border-radius: 100px;
+    font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--red); font-weight: 600;
+    box-shadow: var(--shadow-soft);
+    margin-bottom: 1.5rem;
+  }
+  .hero-tagline .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--red);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1);} 50% { opacity: 0.4; transform: scale(1.4);} }
+
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    line-height: 0.95;
+    font-weight: 500;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+    letter-spacing: -2px;
+  }
+  .hero h1 .accent {
+    font-family: 'Caveat', cursive;
+    color: var(--red);
+    font-weight: 700;
+    font-style: italic;
+    display: inline-block;
+    transform: rotate(-2deg);
+  }
+  .hero p.lead {
+    font-size: 1.1rem;
+    color: rgba(42, 24, 16, 0.75);
+    max-width: 480px;
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+  }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn {
+    padding: 1rem 2rem;
+    border-radius: 100px;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn-primary {
+    background: var(--red); color: white;
+    box-shadow: 0 10px 30px rgba(200, 16, 46, 0.3);
+  }
+  .btn-primary:hover { background: var(--red-deep); transform: translateY(-3px); box-shadow: 0 15px 40px rgba(200, 16, 46, 0.4); }
+  .btn-ghost {
+    background: var(--glass-strong);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    color: var(--dark);
+    border: 1px solid var(--border-glass);
+  }
+  .btn-ghost:hover { background: white; transform: translateY(-3px); }
+
+  /* hero visual */
+  .hero-visual {
+    position: relative;
+    height: 600px;
+  }
+  @media (max-width: 900px) { .hero-visual { height: 450px; } }
+
+  .float-card {
+    position: absolute;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow-strong);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .float-card img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  .float-card-1 {
+    top: 0; left: 5%;
+    width: 55%; height: 60%;
+    animation: float 6s ease-in-out infinite;
+  }
+  .float-card-2 {
+    bottom: 5%; right: 0;
+    width: 50%; height: 50%;
+    animation: float 7s ease-in-out infinite 1s;
+  }
+  .float-card-3 {
+    top: 25%; right: 8%;
+    width: 30%; height: 30%;
+    border-radius: 50%;
+    animation: float 5s ease-in-out infinite 0.5s;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+
+  .floating-badge {
+    position: absolute;
+    background: var(--glass-strong);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--border-glass);
+    border-radius: 18px;
+    padding: 0.9rem 1.2rem;
+    box-shadow: var(--shadow-soft);
+    display: flex; align-items: center; gap: 0.7rem;
+    z-index: 5;
+    animation: float 4s ease-in-out infinite;
+  }
+  .floating-badge.tradition {
+    top: 38%; left: -2%;
+    animation-delay: 0.3s;
+  }
+  .floating-badge.rating {
+    bottom: 15%; left: 12%;
+    animation-delay: 1s;
+  }
+  .badge-icon {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: var(--red); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-family: 'Caveat', cursive; font-size: 1.3rem;
+  }
+  .badge-text { font-size: 0.7rem; color: rgba(42,24,16,0.6); letter-spacing: 1px; text-transform: uppercase; }
+  .badge-value { font-size: 0.95rem; font-weight: 700; color: var(--dark); }
+
+  /* scroll indicator */
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem; left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem; letter-spacing: 3px;
+    color: rgba(42,24,16,0.5);
+    text-transform: uppercase;
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  }
+  .scroll-hint .line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--red));
+    animation: scrollLine 2s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0%, 100% { transform: scaleY(0.5); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+  }
+
+  /* ============ SECTION HEADERS ============ */
+  section { padding: 8rem 3rem; position: relative; }
+  @media (max-width: 900px) { section { padding: 5rem 1.5rem; } }
+  .section-container { max-width: 1400px; margin: 0 auto; }
+
+  .section-head { text-align: center; margin-bottom: 5rem; }
+  .section-eyebrow {
+    display: inline-block;
+    font-family: 'Caveat', cursive;
+    font-size: 1.5rem;
+    color: var(--red);
+    margin-bottom: 0.5rem;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 1;
+    font-weight: 500;
+    color: var(--dark);
+    letter-spacing: -1.5px;
+    max-width: 900px; margin: 0 auto;
+  }
+  .section-title em {
+    font-family: 'Caveat', cursive;
+    color: var(--red);
+    font-style: normal;
+  }
+  .section-sub {
+    margin-top: 1.5rem;
+    color: rgba(42,24,16,0.65);
+    max-width: 600px; margin-left: auto; margin-right: auto;
+    font-size: 1.05rem;
+  }
+
+  /* ============ STORY SECTION ============ */
+  .story {
+    background: var(--cream);
+    position: relative;
+  }
+  .story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem; align-items: center;
+  }
+  @media (max-width: 900px) { .story-grid { grid-template-columns: 1fr; gap: 3rem; } }
+  .story-text h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.05;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    letter-spacing: -1px;
+  }
+  .story-text h2 em {
+    font-family: 'Caveat', cursive;
+    color: var(--red); font-style: normal;
+  }
+  .story-text p {
+    color: rgba(42,24,16,0.7);
+    font-size: 1.05rem;
+    margin-bottom: 1.2rem;
+    max-width: 480px;
+  }
+  .story-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+  .stat {
+    padding: 1.5rem 1rem;
+    background: var(--glass-strong);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glass);
+    border-radius: 18px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    color: var(--red);
+    font-weight: 600;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(42,24,16,0.6);
+    margin-top: 0.3rem;
+  }
+
+  .story-image {
+    position: relative;
+    height: 550px;
+  }
+  .story-img-main {
+    position: absolute;
+    top: 0; right: 0;
+    width: 85%; height: 80%;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: var(--shadow-strong);
+  }
+  .story-img-main img { width: 100%; height: 100%; object-fit: cover; }
+  .story-img-accent {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 50%; height: 45%;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow-strong);
+    border: 8px solid var(--cream);
+  }
+  .story-img-accent img { width: 100%; height: 100%; object-fit: cover; }
+  .story-sticker {
+    position: absolute;
+    top: 10%; left: -2%;
+    width: 110px; height: 110px;
+    background: var(--red); color: white;
+    border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-strong);
+    transform: rotate(-12deg);
+    z-index: 3;
+    animation: spin-slow 20s linear infinite;
+  }
+  @keyframes spin-slow { from { transform: rotate(-12deg); } to { transform: rotate(348deg); } }
+  .story-sticker-inner {
+    font-family: 'Caveat', cursive;
+    text-align: center;
+    line-height: 1;
+  }
+  .story-sticker-inner .big { font-size: 2rem; display: block; }
+  .story-sticker-inner .small { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.3rem; }
+
+  /* ============ MENU CATEGORIES ============ */
+  .categories {
+    background: linear-gradient(180deg, var(--cream) 0%, #f5ede0 100%);
+  }
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+  @media (max-width: 1100px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .cat-grid { grid-template-columns: 1fr; } }
+
+  .cat-card {
+    position: relative;
+    height: 480px;
+    border-radius: 28px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cat-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 30%, rgba(42, 24, 16, 0.85) 100%);
+    z-index: 2;
+    transition: opacity 0.4s;
+  }
+  .cat-card img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cat-card:hover { transform: translateY(-10px); }
+  .cat-card:hover img { transform: scale(1.1); }
+
+  .cat-content {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 2rem;
+    z-index: 3;
+    color: white;
+  }
+  .cat-number {
+    font-family: 'Caveat', cursive;
+    font-size: 1.3rem;
+    opacity: 0.7;
+    margin-bottom: 0.3rem;
+  }
+  .cat-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+  .cat-desc {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    margin-bottom: 1rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, margin 0.5s ease;
+  }
+  .cat-card:hover .cat-desc { max-height: 100px; margin-bottom: 1rem; }
+  .cat-link {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: white;
+  }
+  .cat-link svg { transition: transform 0.3s; }
+  .cat-card:hover .cat-link svg { transform: translateX(5px); }
+
+  /* ============ EISCAFÉ SHOWCASE ============ */
+  .eiscafe {
+    background: linear-gradient(180deg, #f5ede0 0%, #faf6f0 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .eiscafe-orbit {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  @media (max-width: 900px) { .eiscafe-orbit { grid-template-columns: 1fr; } }
+
+  .ice-stack {
+    position: relative;
+    height: 600px;
+  }
+  .ice-img {
+    position: absolute;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow-strong);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ice-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ice-img-1 { top: 0; left: 0; width: 60%; height: 55%; z-index: 1; }
+  .ice-img-2 { top: 15%; right: 0; width: 50%; height: 45%; z-index: 2; }
+  .ice-img-3 { bottom: 0; left: 15%; width: 55%; height: 45%; z-index: 3; }
+
+  .ice-text h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.05;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+  }
+  .ice-features {
+    list-style: none;
+    margin-top: 2rem;
+  }
+  .ice-features li {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(42, 24, 16, 0.08);
+    font-size: 1rem;
+  }
+  .ice-features li:last-child { border-bottom: none; }
+  .ice-features .ic-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    color: var(--red);
+    font-weight: 600;
+    line-height: 1;
+    min-width: 80px;
+  }
+  .ice-features .ic-label { color: rgba(42,24,16,0.75); }
+
+  /* ============ MENU TASTE ============ */
+  .taste {
+    background: var(--dark);
+    color: var(--cream);
+    position: relative;
+    overflow: hidden;
+  }
+  .taste::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(200, 16, 46, 0.15) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(212, 165, 116, 0.1) 0%, transparent 40%);
+  }
+  .taste .section-title { color: var(--cream); }
+  .taste .section-sub { color: rgba(250, 246, 240, 0.6); }
+  .taste .section-eyebrow { color: var(--gold); }
+
+  .taste-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    position: relative;
+  }
+  @media (max-width: 900px) { .taste-grid { grid-template-columns: 1fr; } }
+
+  .taste-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .taste-card:hover {
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(212, 165, 116, 0.3);
+  }
+  .taste-img {
+    height: 240px;
+    overflow: hidden;
+    position: relative;
+  }
+  .taste-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s; }
+  .taste-card:hover .taste-img img { transform: scale(1.08); }
+  .taste-tag {
+    position: absolute;
+    top: 1rem; left: 1rem;
+    background: var(--glass-strong);
+    backdrop-filter: blur(20px);
+    color: var(--dark);
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .taste-body { padding: 1.8rem; }
+  .taste-body h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+    color: var(--cream);
+  }
+  .taste-body p {
+    font-size: 0.9rem;
+    color: rgba(250, 246, 240, 0.65);
+    line-height: 1.6;
+  }
+
+  /* ============ MENU FULL ============ */
+  .menu-full {
+    background: linear-gradient(180deg, var(--dark) 0%, #1a0f08 100%);
+    color: var(--cream);
+    position: relative;
+    overflow: hidden;
+  }
+  .menu-full::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(212, 165, 116, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(200, 16, 46, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .menu-full .section-title { color: var(--cream); }
+  .menu-full .section-sub { color: rgba(250, 246, 240, 0.6); }
+  .menu-full .section-eyebrow { color: var(--gold); }
+
+  .menu-tabs {
+    display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap;
+    margin-bottom: 4rem;
+  }
+  .menu-tab {
+    padding: 0.7rem 1.5rem;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 100px;
+    color: rgba(250, 246, 240, 0.7);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .menu-tab:hover { color: var(--cream); border-color: var(--gold); }
+  .menu-tab.active {
+    background: var(--red); color: white;
+    border-color: var(--red);
+    box-shadow: 0 10px 30px rgba(200, 16, 46, 0.35);
+  }
+
+  .menu-panel { display: none; animation: fadeIn 0.6s ease; }
+  .menu-panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .dish-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem 3rem;
+  }
+  @media (max-width: 800px) { .dish-grid { grid-template-columns: 1fr; gap: 1rem; } }
+
+  .dish {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+    padding: 1.2rem 0;
+    border-bottom: 1px dashed rgba(212, 165, 116, 0.2);
+    transition: padding 0.3s;
+  }
+  .dish:hover { padding-left: 0.5rem; }
+  .dish-info { flex: 1; }
+  .dish-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    color: var(--cream);
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .dish-tag {
+    display: inline-flex; align-items: center;
+    font-size: 0.55rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 100px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+  .dish-tag.veg { background: rgba(100, 180, 100, 0.15); color: #88c97a; }
+  .dish-tag.vegan { background: rgba(100, 180, 100, 0.2); color: #a3e08a; }
+  .dish-tag.spicy { background: rgba(200, 16, 46, 0.2); color: #ff7080; }
+  .dish-tag.new { background: rgba(212, 165, 116, 0.2); color: var(--gold); }
+  .dish-desc {
+    font-size: 0.82rem;
+    color: rgba(250, 246, 240, 0.55);
+    line-height: 1.55;
+  }
+  .dish-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ============ BRUNCH SECTION ============ */
+  .brunch {
+    background: linear-gradient(135deg, var(--soft-pink) 0%, var(--cream) 50%, var(--warm) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .brunch-card {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--glass-strong);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid var(--border-glass);
+    border-radius: 36px;
+    padding: 4rem;
+    box-shadow: var(--shadow-strong);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  @media (max-width: 900px) { .brunch-card { grid-template-columns: 1fr; padding: 2.5rem; gap: 2rem; } }
+
+  .brunch-deco {
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200, 16, 46, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .brunch-deco.d1 { top: -50px; right: -50px; }
+  .brunch-deco.d2 { bottom: -50px; left: -50px; background: radial-gradient(circle, rgba(212, 165, 116, 0.2) 0%, transparent 70%); }
+
+  .brunch-content h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--dark);
+    line-height: 1.05;
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+  .brunch-content h3 em {
+    font-family: 'Caveat', cursive;
+    color: var(--red); font-style: normal;
+  }
+  .brunch-content p {
+    color: rgba(42, 24, 16, 0.7);
+    margin-bottom: 1.5rem;
+  }
+  .brunch-price {
+    display: inline-flex; align-items: baseline; gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .brunch-price .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4rem; color: var(--red);
+    font-weight: 600; line-height: 1;
+  }
+  .brunch-price .unit { color: rgba(42, 24, 16, 0.7); font-size: 1rem; }
+  .brunch-info {
+    display: flex; flex-direction: column; gap: 0.7rem;
+    margin: 1.5rem 0 2rem;
+  }
+  .brunch-info-item {
+    display: flex; align-items: center; gap: 0.8rem;
+    font-size: 0.95rem;
+  }
+  .brunch-info-item svg { color: var(--red); flex-shrink: 0; }
+  .brunch-image {
+    position: relative;
+    height: 400px;
+    border-radius: 28px;
+    overflow: hidden;
+  }
+  .brunch-image img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ============ RESERVATION ============ */
+  .reserve {
+    background: var(--cream);
+    position: relative;
+  }
+  .reserve-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) { .reserve-wrap { grid-template-columns: 1fr; gap: 3rem; } }
+
+  .reserve-info h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.05;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+  }
+  .reserve-info p {
+    color: rgba(42, 24, 16, 0.7);
+    max-width: 480px;
+    margin-bottom: 2rem;
+  }
+  .reserve-details {
+    display: flex; flex-direction: column; gap: 1rem;
+    margin-top: 2rem;
+  }
+  .reserve-detail {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1.2rem;
+    background: var(--glass-strong);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glass);
+    border-radius: 18px;
+    transition: transform 0.3s;
+  }
+  .reserve-detail:hover { transform: translateX(5px); }
+  .rd-icon {
+    width: 44px; height: 44px;
+    background: var(--red); color: white;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .rd-label { font-size: 0.7rem; color: rgba(42,24,16,0.55); letter-spacing: 1.5px; text-transform: uppercase; }
+  .rd-value { font-size: 1rem; color: var(--dark); font-weight: 500; margin-top: 0.2rem; }
+
+  .reserve-form {
+    background: var(--glass-strong);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid var(--border-glass);
+    border-radius: 28px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-strong);
+  }
+  .reserve-form h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .form-row.single { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-group label {
+    font-size: 0.7rem; letter-spacing: 1.5px;
+    text-transform: uppercase; color: rgba(42,24,16,0.6);
+    font-weight: 600;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    padding: 0.9rem 1rem;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(42, 24, 16, 0.1);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--dark);
+    transition: all 0.3s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--red);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.08);
+  }
+  .form-submit {
+    width: 100%;
+    padding: 1.1rem;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: all 0.3s;
+    box-shadow: 0 10px 30px rgba(200, 16, 46, 0.25);
+  }
+  .form-submit:hover { background: var(--red-deep); transform: translateY(-2px); box-shadow: 0 15px 40px rgba(200, 16, 46, 0.35); }
+
+  /* ============ FOOTER ============ */
+  footer {
+    background: var(--dark);
+    color: var(--cream);
+    padding: 5rem 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .footer-grid {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 4rem;
+  }
+  @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; } }
+  @media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; } }
+
+  .footer-brand .nav-logo { color: var(--gold); font-size: 2rem; margin-bottom: 1rem; }
+  .footer-brand p { color: rgba(250, 246, 240, 0.6); max-width: 320px; font-size: 0.9rem; line-height: 1.7; }
+  .footer-col h5 {
+    font-family: 'Caveat', cursive;
+    font-size: 1.3rem;
+    color: var(--gold);
+    margin-bottom: 1.2rem;
+  }
+  .footer-col a, .footer-col p {
+    color: rgba(250, 246, 240, 0.65);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    transition: color 0.3s;
+  }
+  .footer-col a:hover { color: var(--cream); }
+
+  .footer-bottom {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(250, 246, 240, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: rgba(250, 246, 240, 0.5);
+  }
+  .socials { display: flex; gap: 0.8rem; }
+  .socials a {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cream);
+    transition: all 0.3s;
+  }
+  .socials a:hover { background: var(--red); border-color: var(--red); transform: translateY(-3px); }
+
+  /* ============ SCROLL ANIMATIONS ============ */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .fade-up.in { opacity: 1; transform: translateY(0); }
+  .fade-up.delay-1 { transition-delay: 0.15s; }
+  .fade-up.delay-2 { transition-delay: 0.3s; }
+  .fade-up.delay-3 { transition-delay: 0.45s; }
+  .fade-up.delay-4 { transition-delay: 0.6s; }
+
+  .reveal-img {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 1.4s cubic-bezier(0.7, 0, 0.3, 1);
+  }
+  .reveal-img.in { clip-path: inset(0 0 0 0); }
+
+  /* ============ MENU CLICK OVERLAY ============ */
+  .menu-clickable {
+    position: relative;
+    cursor: pointer;
+  }
+  .menu-clickable::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(200, 16, 46, 0.0) 0%, rgba(200, 16, 46, 0.0) 100%);
+    transition: background 0.4s;
+    pointer-events: none;
+    z-index: 4;
+    border-radius: inherit;
+  }
+  .menu-clickable:hover::after {
+    background: linear-gradient(135deg, rgba(200, 16, 46, 0.35) 0%, rgba(42, 24, 16, 0.4) 100%);
+  }
+  .menu-clickable .menu-hover-label {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    z-index: 5;
+    background: var(--glass-strong);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--border-glass);
+    color: var(--dark);
+    padding: 0.7rem 1.3rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    box-shadow: var(--shadow-strong);
+    opacity: 0;
+    transition: opacity 0.4s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .menu-clickable:hover .menu-hover-label {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .menu-clickable .menu-hover-label svg { width: 14px; height: 14px; }
+
+  /* ============ HELPER ============ */
+  .penguin-float {
+    position: fixed;
+    bottom: 30px; right: 30px;
+    z-index: 50;
+    width: 70px; height: 70px;
+    background: var(--red);
+    border-radius: 50%;
+    box-shadow: 0 15px 40px rgba(200, 16, 46, 0.35);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: bounce 3s ease-in-out infinite;
+  }
+  .penguin-float:hover { transform: scale(1.1); }
+  .penguin-float svg { width: 42px; height: 42px; }
+</style>
+</head>
+<body>
+
+<!-- ============ CUSTOM CURSOR ============ -->
+<div class="cursor"></div>
+<div class="cursor-ring"></div>
+
+<!-- ============ LOADER ============ -->
+<div class="loader" id="loader">
+  <svg class="loader-penguin" width="80" height="80" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="55" rx="30" ry="38" fill="#2a1810"/>
+    <ellipse cx="50" cy="62" rx="22" ry="30" fill="#faf6f0"/>
+    <ellipse cx="42" cy="42" rx="5" ry="6" fill="#2a1810"/>
+    <ellipse cx="58" cy="42" rx="5" ry="6" fill="#2a1810"/>
+    <circle cx="42" cy="42" r="1.5" fill="white"/>
+    <circle cx="58" cy="42" r="1.5" fill="white"/>
+    <path d="M45 50 Q50 56 55 50 L52 53 L50 54 L48 53 Z" fill="#d4a574"/>
+    <ellipse cx="50" cy="92" rx="14" ry="4" fill="#d4a574"/>
+  </svg>
+  <div class="loader-text">Milchbar Pinguin</div>
+  <div class="loader-bar"></div>
+</div>
+
+<!-- ============ NAVIGATION ============ -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">
+    <svg viewBox="0 0 100 100">
+      <ellipse cx="50" cy="55" rx="30" ry="38" fill="#2a1810"/>
+      <ellipse cx="50" cy="62" rx="22" ry="30" fill="#faf6f0"/>
+      <ellipse cx="42" cy="42" rx="5" ry="6" fill="#2a1810"/>
+      <ellipse cx="58" cy="42" rx="5" ry="6" fill="#2a1810"/>
+      <path d="M45 50 Q50 56 55 50 L52 53 L50 54 L48 53 Z" fill="#d4a574"/>
+    </svg>
+    Pinguin
+  </a>
+  <ul class="nav-links">
+    <li><a href="#story" data-i18n="nav.tradition">Tradition</a></li>
+    <li><a href="#menu" data-i18n="nav.restaurant">Restaurant</a></li>
+    <li><a href="#speisekarte" data-i18n="nav.menu">Speisekarte</a></li>
+    <li><a href="#eiscafe" data-i18n="nav.icecream">Eiscafé</a></li>
+    <li><a href="#brunch" data-i18n="nav.brunch">Brunch</a></li>
+  </ul>
+  <div class="lang-toggle" role="tablist" aria-label="Sprache wählen">
+    <button type="button" data-lang="de" class="active" aria-label="Deutsch">DE</button>
+    <button type="button" data-lang="en" aria-label="English">EN</button>
+  </div>
+  <a href="#reserve" class="nav-cta" data-i18n="nav.reserve">Reservieren</a>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="hero">
+  <div class="hero-grid">
+    <div class="hero-content">
+      <div class="hero-tagline fade-up in">
+        <span class="dot"></span>
+        <span data-i18n="hero.tagline">Tradition seit 1964 · Leipzig</span>
+      </div>
+      <h1 class="fade-up in delay-1" data-i18n="hero.title" data-i18n-html>
+        Süße<br>
+        <span class="accent">Momente</span><br>
+        seit 60 Jahren.
+      </h1>
+      <p class="lead fade-up in delay-2" data-i18n="hero.lead">
+        Ausgewogene frische Küche mit natürlichen Zutaten und Fokus auf Geschmack
+        in Wohlfühlatmosphäre — willkommen in der Milchbar Pinguin im Herzen von Leipzig.
+      </p>
+      <div class="hero-actions fade-up in delay-3">
+        <a href="https://www.milch-bar-pinguin.de/wp-content/uploads/2024/02/MP-Speisekarte2024.pdf" target="_blank" rel="noopener" class="btn btn-primary">
+          <span data-i18n="hero.btn.menu">Speisekarte ansehen</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </a>
+        <a href="#reserve" class="btn btn-ghost" data-i18n="hero.btn.reserve">Tisch reservieren →</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="float-card float-card-1">
+        <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&q=80" alt="Erdbeertorte">
+      </div>
+      <div class="float-card float-card-2">
+        <img src="https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600&q=80" alt="Eisbecher">
+      </div>
+      <div class="float-card float-card-3">
+        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=80" alt="Cafe">
+      </div>
+
+      <div class="floating-badge tradition">
+        <div class="badge-icon">60+</div>
+        <div>
+          <div class="badge-text" data-i18n="hero.badge1.label">Tradition</div>
+          <div class="badge-value" data-i18n="hero.badge1.value">seit 1964</div>
+        </div>
+      </div>
+
+      <div class="floating-badge rating">
+        <div class="badge-icon">★</div>
+        <div>
+          <div class="badge-text" data-i18n="hero.badge2.label">5.286 Bewertungen</div>
+          <div class="badge-value">4,1 · Google</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span data-i18n="hero.scroll">Scroll</span>
+    <span class="line"></span>
+  </div>
+</section>
+
+<!-- ============ STORY ============ -->
+<section class="story" id="story">
+  <div class="section-container">
+    <div class="story-grid">
+      <div class="story-text fade-up">
+        <span class="section-eyebrow" data-i18n="story.eyebrow">Unsere Geschichte</span>
+        <h2 data-i18n="story.title" data-i18n-html>Eine Leipziger <em>Institution</em> mit Charakter.</h2>
+        <p data-i18n="story.p1">
+          Im Herzen von Leipzig, oberhalb des Museums der Bildenden Künste, verbinden wir
+          seit 1964 frische Küche, hausgemachte Konditorei und eine Eisbar mit über 30 Sorten
+          Kugeleis zu einem Ort, an dem Genuss Tradition hat.
+        </p>
+        <p data-i18n="story.p2">
+          Vom Frühstücksbuffet bis zum Schlemmerbrunch, von köstlichen Torten aus eigener
+          Konditorei bis zu kreativen Eisbechern — bei uns findet jeder seinen Lieblingsmoment.
+        </p>
+        <div class="story-stats">
+          <div class="stat">
+            <div class="stat-num">30+</div>
+            <div class="stat-label" data-i18n="story.stat1">Eissorten</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">90+</div>
+            <div class="stat-label" data-i18n="story.stat2">Eisbecher</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">60</div>
+            <div class="stat-label" data-i18n="story.stat3">Jahre Tradition</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="story-image fade-up delay-1">
+        <div class="story-sticker">
+          <div class="story-sticker-inner">
+            <span class="big" data-i18n="story.sticker1">Seit</span>
+            <span class="big">1964</span>
+            <span class="small" data-i18n="story.sticker2">Tradition</span>
+          </div>
+        </div>
+        <div class="story-img-main">
+          <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=900&q=80" alt="Restaurant interior">
+        </div>
+        <div class="story-img-accent">
+          <img src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=500&q=80" alt="Cafe atmosphere">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CATEGORIES (4 universos) ============ -->
+<section class="categories" id="menu">
+  <div class="section-container">
+    <div class="section-head fade-up">
+      <span class="section-eyebrow" data-i18n="cat.eyebrow">Vier Welten unter einem Dach</span>
+      <h2 class="section-title" data-i18n="cat.title" data-i18n-html>Alles was das <em>Herz</em> begehrt.</h2>
+      <p class="section-sub" data-i18n="cat.sub">
+        Restaurant, Eiscafé, Konditorei und Bar — wir vereinen die schönsten Genussmomente
+        an einem Ort.
+      </p>
+    </div>
+
+    <div class="cat-grid">
+      <div class="cat-card fade-up delay-1">
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80" alt="Restaurant">
+        <div class="cat-content">
+          <div class="cat-number">01</div>
+          <div class="cat-title" data-i18n="cat.c1.title">Restaurant</div>
+          <div class="cat-desc" data-i18n="cat.c1.desc">Frühstück, Wraps, Salate, Burger und hausgemachte Klassiker.</div>
+          <a class="cat-link" href="#">
+            <span data-i18n="cat.link">Entdecken</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="cat-card fade-up delay-2">
+        <img src="https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800&q=80" alt="Eiscafé">
+        <div class="cat-content">
+          <div class="cat-number">02</div>
+          <div class="cat-title" data-i18n="cat.c2.title">Eiscafé</div>
+          <div class="cat-desc" data-i18n="cat.c2.desc">Über 30 Sorten Kugeleis und 90 verschiedene Eisbecher zur Auswahl.</div>
+          <a class="cat-link" href="#eiscafe">
+            <span data-i18n="cat.link">Entdecken</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="cat-card fade-up delay-3">
+        <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&q=80" alt="Konditorei">
+        <div class="cat-content">
+          <div class="cat-number">03</div>
+          <div class="cat-title" data-i18n="cat.c3.title">Konditorei</div>
+          <div class="cat-desc" data-i18n="cat.c3.desc">Täglich frische Kuchen und Torten — jetzt auch in vier veganen Varianten.</div>
+          <a class="cat-link" href="#">
+            <span data-i18n="cat.link">Entdecken</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="cat-card fade-up delay-4">
+        <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=80" alt="Bar">
+        <div class="cat-content">
+          <div class="cat-number">04</div>
+          <div class="cat-title" data-i18n="cat.c4.title">Bar & Brunch</div>
+          <div class="cat-desc" data-i18n="cat.c4.desc">Sonntäglicher Schlemmerbrunch und kreative Drinks im Herzen von Leipzig.</div>
+          <a class="cat-link" href="#brunch">
+            <span data-i18n="cat.link">Entdecken</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EISCAFÉ ============ -->
+<section class="eiscafe" id="eiscafe">
+  <div class="section-container">
+    <div class="eiscafe-orbit">
+      <div class="ice-stack fade-up">
+        <div class="ice-img ice-img-1">
+          <img src="https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=700&q=80" alt="Eisbecher">
+        </div>
+        <div class="ice-img ice-img-2">
+          <img src="https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&q=80" alt="Eis Sorten">
+        </div>
+        <div class="ice-img ice-img-3">
+          <img src="https://images.unsplash.com/photo-1576506295286-5cda18df43e7?w=600&q=80" alt="Eiscreme">
+        </div>
+      </div>
+
+      <div class="ice-text fade-up delay-1">
+        <span class="section-eyebrow" data-i18n="ice.eyebrow">Eiscafé Pinguin</span>
+        <h3 data-i18n="ice.title" data-i18n-html>Mehr als 30 Sorten <em style="font-family:'Caveat',cursive;color:var(--red);font-style:normal">Kugeleis</em> direkt aus der eigenen Eismanufaktur.</h3>
+        <p style="color: rgba(42,24,16,0.7); max-width: 460px;" data-i18n="ice.p">
+          Eiscafé in der Milchbar Pinguin mit großem Freisitz für Jung & Alt.
+          Klassische Becher, Coppa-Becher für Verliebte, kreatives Spaghetti-Eis
+          und fruchtige Milchshakes.
+        </p>
+        <ul class="ice-features">
+          <li>
+            <span class="ic-num">30+</span>
+            <span class="ic-label" data-i18n="ice.f1">Sorten Kugeleis aus eigener Herstellung</span>
+          </li>
+          <li>
+            <span class="ic-num">90+</span>
+            <span class="ic-label" data-i18n="ice.f2">Verschiedene Eisbecher zur Auswahl</span>
+          </li>
+          <li>
+            <span class="ic-num">∞</span>
+            <span class="ic-label" data-i18n="ice.f3">Kreative Spaghetti-Eis Variationen</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TASTE / SPEZIALITÄTEN ============ -->
+<section class="taste">
+  <div class="section-container">
+    <div class="section-head fade-up">
+      <span class="section-eyebrow" data-i18n="taste.eyebrow">Aus unserer Speisekarte</span>
+      <h2 class="section-title" data-i18n="taste.title" data-i18n-html>Frische <em>Küche</em>, natürliche Zutaten.</h2>
+      <p class="section-sub" data-i18n="taste.sub">
+        Eine kleine Auswahl von dem, was Sie bei uns erwartet — täglich frisch zubereitet.
+      </p>
+    </div>
+
+    <div class="taste-grid">
+      <div class="taste-card fade-up delay-1">
+        <div class="taste-img">
+          <span class="taste-tag"><span data-i18n="taste.tag.bestseller">Bestseller</span> · 13,90 €</span>
+          <img src="https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=700&q=80" alt="Milchbar Burger">
+        </div>
+        <div class="taste-body">
+          <h4>Milchbar Burger</h4>
+          <p data-i18n="taste.t1.desc">Hähnchenbrust, Gouda, Burger Sauce, Rotweinzwiebeljam, Tomate, Gurke, Salat — auf hausgebackenem Burger Bun.</p>
+        </div>
+      </div>
+
+      <div class="taste-card fade-up delay-2">
+        <div class="taste-img">
+          <span class="taste-tag"><span data-i18n="taste.tag.vegan">Vegan</span> · 15,90 €</span>
+          <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=700&q=80" alt="Green Live Bowl">
+        </div>
+        <div class="taste-body">
+          <h4>Green Live Bowl</h4>
+          <p data-i18n="taste.t2.desc">Blattsalat, Duftreis, Brokkoli, Sesam, Gurke, Paprika, Karotte und Avocado — knackfrisch & vor Ihren Augen zubereitet.</p>
+        </div>
+      </div>
+
+      <div class="taste-card fade-up delay-3">
+        <div class="taste-img">
+          <span class="taste-tag"><span data-i18n="taste.tag.recommend">Empfehlung</span> · 14,90 €</span>
+          <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=700&q=80" alt="Spaghetti Teriyaki">
+        </div>
+        <div class="taste-body">
+          <h4>Spaghetti Teriyaki</h4>
+          <p data-i18n="taste.t3.desc">Hähnchenbruststreifen, Teriyaki Sauce, Ingwer, Frühlingslauch, Zucchini und Paprika — kreativ und voller Geschmack.</p>
+        </div>
+      </div>
+
+      <div class="taste-card fade-up delay-1">
+        <div class="taste-img">
+          <span class="taste-tag"><span data-i18n="taste.tag.classic">Klassiker</span> · 13,90 €</span>
+          <img src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=700&q=80" alt="French Toast">
+        </div>
+        <div class="taste-body">
+          <h4 data-i18n="taste.t4.name">Sandwich French Toast</h4>
+          <p data-i18n="taste.t4.desc">In Ei gebackenes Toastbrot, Blattsalat, Tomate, Hähnchenbruststreifen und Aprikosen-Schnittlauch-Dressing.</p>
+        </div>
+      </div>
+
+      <div class="taste-card fade-up delay-2">
+        <div class="taste-img">
+          <span class="taste-tag"><span data-i18n="taste.tag.veg">Vegetarisch</span> · 12,90 €</span>
+          <img src="https://images.unsplash.com/photo-1568051243851-f9b136146e97?w=700&q=80" alt="Ofenkartoffel">
+        </div>
+        <div class="taste-body">
+          <h4 data-i18n="taste.t5.name">Ofenkartoffel Teriyaki</h4>
+          <p data-i18n="taste.t5.desc">Knusprige Ofenkartoffel mit Teriyaki Hähnchen oder klassisch mit Kräuterquark (8,90 €) — von würzig bis raffiniert.</p>
+        </div>
+      </div>
+
+      <div class="taste-card fade-up delay-3">
+        <div class="taste-img">
+          <span class="taste-tag"><span data-i18n="taste.tag.sweet">Süß</span> · 7,90 €</span>
+          <img src="https://images.unsplash.com/photo-1488477304112-4944851de03d?w=700&q=80" alt="Quarkkeulchen">
+        </div>
+        <div class="taste-body">
+          <h4 data-i18n="taste.t6.name">Sächsische Quarkkeulchen</h4>
+          <p data-i18n="taste.t6.desc">Traditionelle Quarkkeulchen mit hausgemachtem Apfelmus — wie bei Großmuttern, mit erlesenen frischen Zutaten ohne Zusatzstoffe.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MENU COMPLETE ============ -->
+<section class="menu-full" id="speisekarte">
+  <div class="section-container">
+    <div class="section-head fade-up">
+      <span class="section-eyebrow" data-i18n="menu.eyebrow">Komplette Speisekarte</span>
+      <h2 class="section-title" data-i18n="menu.title" data-i18n-html>Aus unserer <em>Küche</em>.</h2>
+      <p class="section-sub" data-i18n="menu.sub">
+        Eine Auswahl unserer Lieblinge — Wraps, Pasta, Burger, Bowls und mehr.
+        Alle Preise in Euro inkl. MwSt. Stand 01/2024.
+      </p>
+    </div>
+
+    <div class="menu-tabs fade-up delay-1">
+      <button class="menu-tab active" data-tab="wraps" data-i18n="menu.tab.wraps">Wraps & Sandwiches</button>
+      <button class="menu-tab" data-tab="bowls" data-i18n="menu.tab.bowls">Bowls & Salate</button>
+      <button class="menu-tab" data-tab="pasta" data-i18n="menu.tab.pasta">Pasta</button>
+      <button class="menu-tab" data-tab="burger" data-i18n="menu.tab.burger">Burger</button>
+      <button class="menu-tab" data-tab="kartoffel" data-i18n="menu.tab.potato">Ofenkartoffeln</button>
+      <button class="menu-tab" data-tab="dessert" data-i18n="menu.tab.dessert">Dessert</button>
+    </div>
+
+    <!-- WRAPS & SANDWICHES -->
+    <div class="menu-panel active fade-up delay-2" data-panel="wraps">
+      <div class="dish-grid">
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Teriyaki Wrap</div>
+            <div class="dish-desc">Hähnchen · Teriyaki Sauce · Frühlingslauch · Duftreis · Tortilla</div>
+          </div>
+          <div class="dish-price">10,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Chicken Tender Wrap</div>
+            <div class="dish-desc">Hähnchenbruststreifen · Gouda · Tomate · Gurke · BBQ · Bacon · Jalapeños</div>
+          </div>
+          <div class="dish-price">10,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Halloumi Wrap <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Paprika · Zucchini · Halloumi · Salat · Honig-Vinaigrette · Tortilla</div>
+          </div>
+          <div class="dish-price">10,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Sandwich Caprese <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Mozzarella · Tomate · Rucola · Basilikum-Crema</div>
+          </div>
+          <div class="dish-price">9,70 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Ultimate Schnitzel Sandwich</div>
+            <div class="dish-desc">Hähnchenschnitzel · Salat · Gouda · Tomate · Jalapeños · Paprika</div>
+          </div>
+          <div class="dish-price">12,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Baked Avocado Sandwich <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Gegrillte Avocado · pochiertes Ei · Bruschetta-Tomaten · Basilikum</div>
+          </div>
+          <div class="dish-price">10,50 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Sandwich French Toast</div>
+            <div class="dish-desc">In Ei gebackenes Toastbrot · Hähnchen · Aprikosen-Schnittlauch-Dressing</div>
+          </div>
+          <div class="dish-price">13,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Bruschetta im Duett <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Klassisch · mit Ziegenkäse · auf Kräuter-Brioche aus eigener Bäckerei</div>
+          </div>
+          <div class="dish-price">9,90 €</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOWLS & SALATE -->
+    <div class="menu-panel fade-up" data-panel="bowls">
+      <div class="dish-grid">
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Kleine Milchbar Bowl <span class="dish-tag vegan">Vegan</span></div>
+            <div class="dish-desc">Perl-Couscous · Paprika</div>
+          </div>
+          <div class="dish-price">8,50 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Milchbar Bowl <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Blattsalat · Tomate · Gurke · Hirtenkäse · Duftreis · Paprika · Karotte</div>
+          </div>
+          <div class="dish-price">12,50 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Caprese Bowl <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Mozzarella · Kirschtomaten · Basilikumpesto · Balsamicocrema</div>
+          </div>
+          <div class="dish-price">12,50 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Green Live Bowl <span class="dish-tag vegan">Vegan</span></div>
+            <div class="dish-desc">Blattsalat · Duftreis · Brokkoli · Sesam · Gurke · Paprika · Karotte · Avocado</div>
+          </div>
+          <div class="dish-price">15,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Tomatensuppe <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Hausgemacht · Pesto · Brot · klein 6,90 / groß</div>
+          </div>
+          <div class="dish-price">9,50 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Soljanka</div>
+            <div class="dish-desc">Hausgemacht · Zitrone · Schmand · Brot · klein 8,50 / groß</div>
+          </div>
+          <div class="dish-price">10,50 €</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASTA -->
+    <div class="menu-panel fade-up" data-panel="pasta">
+      <div class="dish-grid">
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Spaghetti Vital <span class="dish-tag vegan">Vegan</span></div>
+            <div class="dish-desc">Brokkoli · Zucchini · Karotten · Paprika · Frühlingslauch · Basilikum · Olivenöl</div>
+          </div>
+          <div class="dish-price">11,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Spaghetti Aglio e Olio <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Knoblauch · Olivenöl · Petersilie · Grana Padano</div>
+          </div>
+          <div class="dish-price">12,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Penne Pesto <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Basilikumpesto · Kirschtomaten · Pinienkerne · Grana Padano</div>
+          </div>
+          <div class="dish-price">13,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Penne Avocado <span class="dish-tag vegan">Vegan</span></div>
+            <div class="dish-desc">Guacamole · Kirschtomaten · Basilikum</div>
+          </div>
+          <div class="dish-price">13,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Spaghetti Teriyaki</div>
+            <div class="dish-desc">Hähnchenbruststreifen · Teriyaki · Ingwer · Frühlingslauch · Zucchini · Paprika</div>
+          </div>
+          <div class="dish-price">14,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Spaghetti Carbonara</div>
+            <div class="dish-desc">Speck · Zwiebel · Knoblauch · Eigelb · Petersilie · Grana Padano</div>
+          </div>
+          <div class="dish-price">14,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Penne Bruschetta</div>
+            <div class="dish-desc">Hähnchenbruststreifen · Bruschetta-Tomaten · Grana Padano</div>
+          </div>
+          <div class="dish-price">14,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Jalapeños Chicken Pasta <span class="dish-tag spicy" data-i18n="dish.spicy">Scharf</span></div>
+            <div class="dish-desc">Penne · Hähnchen · Oliven · Paprika · Frühlingslauch · Kirschtomaten</div>
+          </div>
+          <div class="dish-price">14,90 €</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BURGER -->
+    <div class="menu-panel fade-up" data-panel="burger">
+      <div class="dish-grid">
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Milchbar Burger</div>
+            <div class="dish-desc">Hähnchenbrust · Gouda · Burger Sauce · Rotweinzwiebeljam · Hausgebackener Bun</div>
+          </div>
+          <div class="dish-price">13,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">The Big Burger</div>
+            <div class="dish-desc">2 Rinder Patties · Cheddar · BBQ Sauce · Tomate · Gurke · Salat · Bun</div>
+          </div>
+          <div class="dish-price">16,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Devil's Choice Burger <span class="dish-tag spicy" data-i18n="dish.spicy">Scharf</span></div>
+            <div class="dish-desc">Rinder Patty · Spiegelei · Cheddar · Bacon · Rote Bete · Jalapeños · BBQ</div>
+          </div>
+          <div class="dish-price">15,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Vegi Sloopy Joe Burger <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Cheddar · Salat · Jalapeños · Zwiebel · Vegetarische BBQ-Hacksauce</div>
+          </div>
+          <div class="dish-price">13,70 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Hähnchenschnitzel</div>
+            <div class="dish-desc">Mit gemischtem Salat · alternativ mit Bacon (18,90 €)</div>
+          </div>
+          <div class="dish-price">16,50 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Schnitzel Bruschetta Caprese</div>
+            <div class="dish-desc">Bruschetta-Tomaten · Mozzarella · Minikartoffeln · Kräuterquark</div>
+          </div>
+          <div class="dish-price">18,50 €</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OFENKARTOFFEL -->
+    <div class="menu-panel fade-up" data-panel="kartoffel">
+      <div class="dish-grid">
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Klassisch <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Ofenkartoffel mit Kräuter-Brioche aus eigener Bäckerei</div>
+          </div>
+          <div class="dish-price">7,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Kräuterquark <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Klassisch mit hausgemachtem Kräuterquark</div>
+          </div>
+          <div class="dish-price">8,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Guacamole <span class="dish-tag vegan">Vegan</span></div>
+            <div class="dish-desc">Limette · Tomate · Frische Avocado</div>
+          </div>
+          <div class="dish-price">12,50 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Teriyaki Hähnchen</div>
+            <div class="dish-desc">Knusprige Ofenkartoffel mit Teriyaki Hähnchen und Kräuterquark</div>
+          </div>
+          <div class="dish-price">12,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Gratinierter Ziegenkäse <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Salat · Honig-Kirschtomaten · Brot</div>
+          </div>
+          <div class="dish-price">13,50 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Knoblauchbaguette <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Guacamole · Kräuterquark</div>
+          </div>
+          <div class="dish-price">6,90 €</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESSERT -->
+    <div class="menu-panel fade-up" data-panel="dessert">
+      <div class="dish-grid">
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Eierkuchen <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Obst · Puderzucker · optional Zimt, Apfelmus oder Nutella</div>
+          </div>
+          <div class="dish-price">5,40 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Warmer Apfelstrudel <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Mit Vanilleeis · traditionell zubereitet</div>
+          </div>
+          <div class="dish-price">7,50 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Hausgemachtes Tiramisu <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Italienisches Original aus eigener Konditorei</div>
+          </div>
+          <div class="dish-price">6,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Sächsische Quarkkeulchen <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Mit hausgemachtem Apfelmus · traditionell sächsisch</div>
+          </div>
+          <div class="dish-price">7,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Eis-Schokolade Klassik <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Vanille- und Schokoeis · kalter Kakao · Sahne · groß 7,50 €</div>
+          </div>
+          <div class="dish-price">6,90 €</div>
+        </div>
+        <div class="dish">
+          <div class="dish-info">
+            <div class="dish-name">Eis-Kaffee Klassik <span class="dish-tag veg">Veg</span></div>
+            <div class="dish-desc">Vanille- und Moccaeis · kalter Kaffee · Sahne · groß 7,50 €</div>
+          </div>
+          <div class="dish-price">6,90 €</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 4rem;" class="fade-up">
+      <a href="https://www.milch-bar-pinguin.de/wp-content/uploads/2024/02/MP-Speisekarte2024.pdf" target="_blank" class="btn btn-primary">
+        <span data-i18n="menu.fullpdf">Komplette Speisekarte (PDF)</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BRUNCH ============ -->
+<section class="brunch" id="brunch">
+  <div class="section-container">
+    <div class="section-head fade-up">
+      <span class="section-eyebrow" data-i18n="brunch.eyebrow">Schlemmerbrunch</span>
+      <h2 class="section-title" data-i18n="brunch.title" data-i18n-html>Jeden Sonntag von <em>10–14 Uhr</em>.</h2>
+    </div>
+
+    <div class="brunch-card fade-up delay-1">
+      <div class="brunch-deco d1"></div>
+      <div class="brunch-deco d2"></div>
+
+      <div class="brunch-content">
+        <h3 data-i18n="brunch.h3" data-i18n-html>Für unsere <em>Langschläfer</em>.</h3>
+        <p data-i18n="brunch.p">
+          Schlemmen Sie jeden Sonntag (und an ausgewählten Feiertagen) nach Lust und Laune
+          soviel und sooft Sie mögen. Ab 12 Uhr werden warme Speisen angeboten.
+        </p>
+        <div class="brunch-price">
+          <span class="num">26,90</span>
+          <span class="unit" data-i18n="brunch.unit">€ pro Person · inkl. Säfte · Kinder 7–12 J. 10,90 €</span>
+        </div>
+        <div class="brunch-info">
+          <div class="brunch-info-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span data-i18n="brunch.info1">Sonntags 10:00 – 14:00 Uhr · An Feiertagen 32,90 €</span>
+          </div>
+          <div class="brunch-info-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <span data-i18n="brunch.info2">Reservierung mind. 48h vorher: 0341 / 960 19 79</span>
+          </div>
+        </div>
+        <a href="#reserve" class="btn btn-primary">
+          <span data-i18n="brunch.cta">Jetzt reservieren</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M13 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="brunch-image">
+        <img src="https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800&q=80" alt="Brunch">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESERVATION ============ -->
+<section class="reserve" id="reserve">
+  <div class="section-container">
+    <div class="reserve-wrap">
+      <div class="reserve-info fade-up">
+        <span class="section-eyebrow" data-i18n="res.eyebrow">Reservierung</span>
+        <h3 data-i18n="res.h3" data-i18n-html>Wir freuen uns auf <em style="font-family:'Caveat',cursive;color:var(--red);font-style:normal">Ihren Besuch</em>.</h3>
+        <p data-i18n="res.p">
+          Über unser Reservierungsformular haben Sie die Möglichkeit, online einen Platz
+          in unserem Restaurant zu reservieren. An Stoßzeiten bitten wir um etwas Geduld.
+        </p>
+
+        <div class="reserve-details">
+          <div class="reserve-detail">
+            <div class="rd-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div>
+              <div class="rd-label" data-i18n="res.address">Adresse</div>
+              <div class="rd-value">Katharinenstraße 4, 04109 Leipzig</div>
+            </div>
+          </div>
+
+          <div class="reserve-detail">
+            <div class="rd-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div>
+              <div class="rd-label" data-i18n="res.hours">Öffnungszeiten</div>
+              <div class="rd-value" data-i18n="res.hours.value">Mo–Sa 9:00–22:00 · So 10:00–21:00</div>
+            </div>
+          </div>
+
+          <div class="reserve-detail">
+            <div class="rd-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="rd-label" data-i18n="res.phone">Telefon</div>
+              <div class="rd-value">+49 (0)341 / 960 19 79</div>
+            </div>
+          </div>
+
+          <div class="reserve-detail">
+            <div class="rd-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <div>
+              <div class="rd-label" data-i18n="res.email">E-Mail</div>
+              <div class="rd-value">info@milch-bar-pinguin.de</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reserve-form fade-up delay-1" id="contact">
+        <h4 data-i18n="form.title">Tisch reservieren</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label data-i18n="form.name">Name</label>
+            <input type="text" placeholder="Ihr Name" data-i18n-placeholder="form.name.ph">
+          </div>
+          <div class="form-group">
+            <label data-i18n="form.phone">Telefon</label>
+            <input type="tel" placeholder="Ihre Nummer" data-i18n-placeholder="form.phone.ph">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label data-i18n="form.email">E-Mail</label>
+            <input type="email" placeholder="Ihre E-Mail-Adresse" data-i18n-placeholder="form.email.ph">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label data-i18n="form.date">Datum</label>
+            <input type="date">
+          </div>
+          <div class="form-group">
+            <label data-i18n="form.time">Uhrzeit</label>
+            <input type="time">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label data-i18n="form.people">Personen</label>
+            <select>
+              <option data-i18n="form.people.1">1 Person</option>
+              <option selected data-i18n="form.people.2">2 Personen</option>
+              <option data-i18n="form.people.3">3 Personen</option>
+              <option data-i18n="form.people.4">4 Personen</option>
+              <option data-i18n="form.people.5">5+ Personen</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label data-i18n="form.occasion">Anlass</label>
+            <select>
+              <option data-i18n="form.oc.lunch">Mittagessen</option>
+              <option data-i18n="form.oc.dinner">Abendessen</option>
+              <option data-i18n="form.oc.brunch">Brunch</option>
+              <option data-i18n="form.oc.birthday">Geburtstag</option>
+              <option data-i18n="form.oc.other">Sonstiges</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label data-i18n="form.message">Nachricht (optional)</label>
+            <textarea rows="3" placeholder="Besondere Wünsche oder Anmerkungen" data-i18n-placeholder="form.message.ph"></textarea>
+          </div>
+        </div>
+        <button class="form-submit" type="button" data-i18n="form.submit">Reservierung anfragen →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="nav-logo">
+        <svg width="32" height="32" viewBox="0 0 100 100">
+          <ellipse cx="50" cy="55" rx="30" ry="38" fill="#d4a574"/>
+          <ellipse cx="50" cy="62" rx="22" ry="30" fill="#faf6f0"/>
+          <ellipse cx="42" cy="42" rx="5" ry="6" fill="#2a1810"/>
+          <ellipse cx="58" cy="42" rx="5" ry="6" fill="#2a1810"/>
+          <path d="M45 50 Q50 56 55 50 L52 53 L50 54 L48 53 Z" fill="#c8102e"/>
+        </svg>
+        Milchbar Pinguin
+      </div>
+      <p data-i18n="foot.tagline">
+        Eiscafé · Bar · Restaurant im Herzen von Leipzig. Tradition seit 1964 —
+        frische Küche, hausgemachte Torten und mehr als 30 Sorten Kugeleis.
+      </p>
+    </div>
+
+    <div class="footer-col">
+      <h5 data-i18n="foot.explore">Erkunden</h5>
+      <a href="#story" data-i18n="foot.story">Unsere Geschichte</a>
+      <a href="#menu" data-i18n="foot.menu">Speisekarte</a>
+      <a href="#eiscafe" data-i18n="foot.ice">Eiscafé</a>
+      <a href="#brunch" data-i18n="foot.brunch">Brunch</a>
+      <a href="#reserve" data-i18n="foot.reserve">Reservierung</a>
+    </div>
+
+    <div class="footer-col">
+      <h5 data-i18n="foot.visit">Besuchen</h5>
+      <p>Katharinenstraße 4<br>04109 Leipzig</p>
+      <p data-i18n="foot.hours" data-i18n-html>Mo–Sa: 9:00–22:00<br>Sonntags: 10:00–21:00</p>
+    </div>
+
+    <div class="footer-col">
+      <h5 data-i18n="foot.contact">Kontakt</h5>
+      <a href="tel:+493419601979">+49 (0)341 / 960 19 79</a>
+      <a href="mailto:info@milch-bar-pinguin.de">info@milch-bar-pinguin.de</a>
+      <a href="https://www.milch-bar-pinguin.de">www.milch-bar-pinguin.de</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div data-i18n="foot.copy">© 2011 – 2026 Milchbar Pinguin · Alle Rechte vorbehalten</div>
+    <div class="socials">
+      <a href="#" aria-label="Facebook">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+        </svg>
+      </a>
+      <a href="#" aria-label="Instagram">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ FLOATING PENGUIN ============ -->
+<a href="#reserve" class="penguin-float" aria-label="Reservieren" data-i18n-aria="penguin.aria">
+  <svg viewBox="0 0 100 100">
+    <ellipse cx="50" cy="55" rx="30" ry="38" fill="#2a1810"/>
+    <ellipse cx="50" cy="62" rx="22" ry="30" fill="#faf6f0"/>
+    <ellipse cx="42" cy="42" rx="5" ry="6" fill="#2a1810"/>
+    <ellipse cx="58" cy="42" rx="5" ry="6" fill="#2a1810"/>
+    <circle cx="42" cy="42" r="1.5" fill="white"/>
+    <circle cx="58" cy="42" r="1.5" fill="white"/>
+    <path d="M45 50 Q50 56 55 50 L52 53 L50 54 L48 53 Z" fill="#d4a574"/>
+  </svg>
+</a>
+
+<script>
+  // ============ LOADER ============
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 800);
+  });
+
+  // ============ CUSTOM CURSOR ============
+  const cursor = document.querySelector('.cursor');
+  const ring = document.querySelector('.cursor-ring');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    cursor.style.left = mouseX + 'px';
+    cursor.style.top = mouseY + 'px';
+  });
+
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.18;
+    ringY += (mouseY - ringY) * 0.18;
+    ring.style.left = ringX + 'px';
+    ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, input, select, textarea, .cat-card, .taste-card, .float-card').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.classList.add('hover'); ring.classList.add('hover'); });
+    el.addEventListener('mouseleave', () => { cursor.classList.remove('hover'); ring.classList.remove('hover'); });
+  });
+
+  // ============ NAV SCROLL ============
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  });
+
+  // ============ SCROLL REVEAL ============
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -80px 0px' });
+
+  document.querySelectorAll('.fade-up:not(.in), .reveal-img').forEach(el => observer.observe(el));
+
+  // ============ PARALLAX HERO ============
+  const heroCards = document.querySelectorAll('.hero-visual .float-card');
+  document.addEventListener('mousemove', e => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 2;
+    const y = (e.clientY / window.innerHeight - 0.5) * 2;
+    heroCards.forEach((card, i) => {
+      const depth = (i + 1) * 8;
+      card.style.transform = `translate(${x * depth}px, ${y * depth}px)`;
+    });
+  });
+
+  // ============ TILT EFFECT ON CAT CARDS ============
+  document.querySelectorAll('.cat-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const rx = ((y - cy) / cy) * -6;
+      const ry = ((x - cx) / cx) * 6;
+      card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-10px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+
+  // ============ SMOOTH SCROLL ============
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', e => {
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // ============ MENU TABS ============
+  const menuTabs = document.querySelectorAll('.menu-tab');
+  const menuPanels = document.querySelectorAll('.menu-panel');
+  menuTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      menuTabs.forEach(t => t.classList.remove('active'));
+      menuPanels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector(`.menu-panel[data-panel="${target}"]`).classList.add('active');
+    });
+  });
+
+  // ============ LANGUAGE TOGGLE (DE / EN) ============
+  const translations = {
+    en: {
+      'nav.tradition': 'Tradition',
+      'nav.restaurant': 'Restaurant',
+      'nav.menu': 'Menu',
+      'nav.icecream': 'Ice Café',
+      'nav.brunch': 'Brunch',
+      'nav.reserve': 'Reserve',
+
+      'hero.tagline': 'Tradition since 1964 · Leipzig',
+      'hero.title': 'Sweet<br><span class="accent">Moments</span><br>for 60 years.',
+      'hero.lead': 'Balanced fresh cuisine made with natural ingredients and a focus on flavor in a welcoming atmosphere — welcome to Milchbar Pinguin in the heart of Leipzig.',
+      'hero.btn.menu': 'View Menu',
+      'hero.btn.reserve': 'Book a table →',
+      'hero.badge1.label': 'Tradition',
+      'hero.badge1.value': 'since 1964',
+      'hero.badge2.label': '5,286 Reviews',
+      'hero.scroll': 'Scroll',
+
+      'story.eyebrow': 'Our Story',
+      'story.title': 'A Leipzig <em>institution</em> with character.',
+      'story.p1': 'In the heart of Leipzig, above the Museum of Fine Arts, we have been combining fresh cuisine, homemade pastries and an ice cream bar with over 30 flavors of scoop ice cream since 1964 — a place where indulgence has tradition.',
+      'story.p2': 'From the breakfast buffet to the indulgent brunch, from delicious cakes baked in-house to creative ice cream sundaes — everyone finds their favorite moment with us.',
+      'story.stat1': 'Ice flavors',
+      'story.stat2': 'Sundaes',
+      'story.stat3': 'Years of tradition',
+      'story.sticker1': 'Since',
+      'story.sticker2': 'Tradition',
+
+      'cat.eyebrow': 'Four worlds under one roof',
+      'cat.title': 'Everything the <em>heart</em> desires.',
+      'cat.sub': 'Restaurant, ice café, patisserie and bar — we bring together the finest moments of indulgence in one place.',
+      'cat.c1.title': 'Restaurant',
+      'cat.c1.desc': 'Breakfast, wraps, salads, burgers and homemade classics.',
+      'cat.c2.title': 'Ice Café',
+      'cat.c2.desc': 'Over 30 flavors of scoop ice cream and 90 different sundaes to choose from.',
+      'cat.c3.title': 'Patisserie',
+      'cat.c3.desc': 'Fresh cakes and tarts daily — now also in four vegan varieties.',
+      'cat.c4.title': 'Bar & Brunch',
+      'cat.c4.desc': 'Sunday gourmet brunch and creative drinks in the heart of Leipzig.',
+      'cat.link': 'Discover',
+
+      'ice.eyebrow': 'Ice Café Pinguin',
+      'ice.title': 'More than 30 flavors of <em style="font-family:\'Caveat\',cursive;color:var(--red);font-style:normal">scoop ice cream</em> straight from our own ice cream manufactory.',
+      'ice.p': 'Ice café at Milchbar Pinguin with a large outdoor terrace for young and old. Classic sundaes, Coppa cups for couples, creative spaghetti ice cream and fruity milkshakes.',
+      'ice.f1': 'House-made scoop ice cream flavors',
+      'ice.f2': 'Different sundaes to choose from',
+      'ice.f3': 'Creative spaghetti-ice variations',
+
+      'taste.eyebrow': 'From our menu',
+      'taste.title': 'Fresh <em>cuisine</em>, natural ingredients.',
+      'taste.sub': 'A small selection of what awaits you with us — freshly prepared every day.',
+      'taste.tag.bestseller': 'Bestseller',
+      'taste.tag.vegan': 'Vegan',
+      'taste.tag.recommend': 'Recommended',
+      'taste.tag.classic': 'Classic',
+      'taste.tag.veg': 'Vegetarian',
+      'taste.tag.sweet': 'Sweet',
+      'taste.t1.desc': 'Chicken breast, gouda, burger sauce, red wine onion jam, tomato, cucumber, lettuce — on a house-baked bun.',
+      'taste.t2.desc': 'Leafy salad, fragrant rice, broccoli, sesame, cucumber, pepper, carrot and avocado — crisp, fresh & prepared in front of you.',
+      'taste.t3.desc': 'Chicken strips, teriyaki sauce, ginger, spring onion, zucchini and pepper — creative and full of flavor.',
+      'taste.t4.name': 'French Toast Sandwich',
+      'taste.t4.desc': 'Egg-battered toast, leafy salad, tomato, chicken strips and apricot-chive dressing.',
+      'taste.t5.name': 'Baked Potato Teriyaki',
+      'taste.t5.desc': 'Crispy baked potato with teriyaki chicken or classic with herb quark (€8.90) — from savory to refined.',
+      'taste.t6.name': 'Saxon Quark Dumplings',
+      'taste.t6.desc': 'Traditional quark dumplings with homemade apple sauce — just like grandma\'s, with selected fresh ingredients and no additives.',
+
+      'menu.eyebrow': 'Complete menu',
+      'menu.title': 'From our <em>kitchen</em>.',
+      'menu.sub': 'A selection of our favorites — wraps, pasta, burgers, bowls and more. All prices in euros including VAT. As of 01/2024.',
+      'menu.tab.wraps': 'Wraps & Sandwiches',
+      'menu.tab.bowls': 'Bowls & Salads',
+      'menu.tab.pasta': 'Pasta',
+      'menu.tab.burger': 'Burgers',
+      'menu.tab.potato': 'Baked Potatoes',
+      'menu.tab.dessert': 'Dessert',
+      'menu.fullpdf': 'Full menu (PDF)',
+      'dish.spicy': 'Spicy',
+
+      'brunch.eyebrow': 'Gourmet brunch',
+      'brunch.title': 'Every Sunday from <em>10am – 2pm</em>.',
+      'brunch.h3': 'For our <em>late risers</em>.',
+      'brunch.p': 'Indulge every Sunday (and on selected holidays) as much and as often as you like. Warm dishes are served from 12pm.',
+      'brunch.unit': '€ per person · juices included · Children 7–12y €10.90',
+      'brunch.info1': 'Sundays 10:00 – 14:00 · On holidays €32.90',
+      'brunch.info2': 'Reservation at least 48h in advance: 0341 / 960 19 79',
+      'brunch.cta': 'Reserve now',
+
+      'res.eyebrow': 'Reservation',
+      'res.h3': 'We look forward to <em style="font-family:\'Caveat\',cursive;color:var(--red);font-style:normal">your visit</em>.',
+      'res.p': 'You can use our online reservation form to book a table at our restaurant. During peak times we kindly ask for a little patience.',
+      'res.address': 'Address',
+      'res.hours': 'Opening hours',
+      'res.hours.value': 'Mon–Sat 9:00–22:00 · Sun 10:00–21:00',
+      'res.phone': 'Phone',
+      'res.email': 'Email',
+
+      'form.title': 'Book a table',
+      'form.name': 'Name',
+      'form.name.ph': 'Your name',
+      'form.phone': 'Phone',
+      'form.phone.ph': 'Your number',
+      'form.email': 'Email',
+      'form.email.ph': 'Your email address',
+      'form.date': 'Date',
+      'form.time': 'Time',
+      'form.people': 'Guests',
+      'form.people.1': '1 person',
+      'form.people.2': '2 people',
+      'form.people.3': '3 people',
+      'form.people.4': '4 people',
+      'form.people.5': '5+ people',
+      'form.occasion': 'Occasion',
+      'form.oc.lunch': 'Lunch',
+      'form.oc.dinner': 'Dinner',
+      'form.oc.brunch': 'Brunch',
+      'form.oc.birthday': 'Birthday',
+      'form.oc.other': 'Other',
+      'form.message': 'Message (optional)',
+      'form.message.ph': 'Special requests or notes',
+      'form.submit': 'Request reservation →',
+
+      'foot.tagline': 'Ice café · Bar · Restaurant in the heart of Leipzig. Tradition since 1964 — fresh cuisine, homemade cakes and more than 30 flavors of scoop ice cream.',
+      'foot.explore': 'Explore',
+      'foot.story': 'Our story',
+      'foot.menu': 'Menu',
+      'foot.ice': 'Ice Café',
+      'foot.brunch': 'Brunch',
+      'foot.reserve': 'Reservation',
+      'foot.visit': 'Visit',
+      'foot.hours': 'Mon–Sat: 9:00–22:00<br>Sundays: 10:00–21:00',
+      'foot.contact': 'Contact',
+      'foot.copy': '© 2011 – 2026 Milchbar Pinguin · All rights reserved',
+      'penguin.aria': 'Reserve'
+    },
+    de: {
+      'nav.tradition': 'Tradition',
+      'nav.restaurant': 'Restaurant',
+      'nav.menu': 'Speisekarte',
+      'nav.icecream': 'Eiscafé',
+      'nav.brunch': 'Brunch',
+      'nav.reserve': 'Reservieren',
+
+      'hero.tagline': 'Tradition seit 1964 · Leipzig',
+      'hero.title': 'Süße<br><span class="accent">Momente</span><br>seit 60 Jahren.',
+      'hero.lead': 'Ausgewogene frische Küche mit natürlichen Zutaten und Fokus auf Geschmack in Wohlfühlatmosphäre — willkommen in der Milchbar Pinguin im Herzen von Leipzig.',
+      'hero.btn.menu': 'Speisekarte ansehen',
+      'hero.btn.reserve': 'Tisch reservieren →',
+      'hero.badge1.label': 'Tradition',
+      'hero.badge1.value': 'seit 1964',
+      'hero.badge2.label': '5.286 Bewertungen',
+      'hero.scroll': 'Scroll',
+
+      'story.eyebrow': 'Unsere Geschichte',
+      'story.title': 'Eine Leipziger <em>Institution</em> mit Charakter.',
+      'story.p1': 'Im Herzen von Leipzig, oberhalb des Museums der Bildenden Künste, verbinden wir seit 1964 frische Küche, hausgemachte Konditorei und eine Eisbar mit über 30 Sorten Kugeleis zu einem Ort, an dem Genuss Tradition hat.',
+      'story.p2': 'Vom Frühstücksbuffet bis zum Schlemmerbrunch, von köstlichen Torten aus eigener Konditorei bis zu kreativen Eisbechern — bei uns findet jeder seinen Lieblingsmoment.',
+      'story.stat1': 'Eissorten',
+      'story.stat2': 'Eisbecher',
+      'story.stat3': 'Jahre Tradition',
+      'story.sticker1': 'Seit',
+      'story.sticker2': 'Tradition',
+
+      'cat.eyebrow': 'Vier Welten unter einem Dach',
+      'cat.title': 'Alles was das <em>Herz</em> begehrt.',
+      'cat.sub': 'Restaurant, Eiscafé, Konditorei und Bar — wir vereinen die schönsten Genussmomente an einem Ort.',
+      'cat.c1.title': 'Restaurant',
+      'cat.c1.desc': 'Frühstück, Wraps, Salate, Burger und hausgemachte Klassiker.',
+      'cat.c2.title': 'Eiscafé',
+      'cat.c2.desc': 'Über 30 Sorten Kugeleis und 90 verschiedene Eisbecher zur Auswahl.',
+      'cat.c3.title': 'Konditorei',
+      'cat.c3.desc': 'Täglich frische Kuchen und Torten — jetzt auch in vier veganen Varianten.',
+      'cat.c4.title': 'Bar & Brunch',
+      'cat.c4.desc': 'Sonntäglicher Schlemmerbrunch und kreative Drinks im Herzen von Leipzig.',
+      'cat.link': 'Entdecken',
+
+      'ice.eyebrow': 'Eiscafé Pinguin',
+      'ice.title': 'Mehr als 30 Sorten <em style="font-family:\'Caveat\',cursive;color:var(--red);font-style:normal">Kugeleis</em> direkt aus der eigenen Eismanufaktur.',
+      'ice.p': 'Eiscafé in der Milchbar Pinguin mit großem Freisitz für Jung & Alt. Klassische Becher, Coppa-Becher für Verliebte, kreatives Spaghetti-Eis und fruchtige Milchshakes.',
+      'ice.f1': 'Sorten Kugeleis aus eigener Herstellung',
+      'ice.f2': 'Verschiedene Eisbecher zur Auswahl',
+      'ice.f3': 'Kreative Spaghetti-Eis Variationen',
+
+      'taste.eyebrow': 'Aus unserer Speisekarte',
+      'taste.title': 'Frische <em>Küche</em>, natürliche Zutaten.',
+      'taste.sub': 'Eine kleine Auswahl von dem, was Sie bei uns erwartet — täglich frisch zubereitet.',
+      'taste.tag.bestseller': 'Bestseller',
+      'taste.tag.vegan': 'Vegan',
+      'taste.tag.recommend': 'Empfehlung',
+      'taste.tag.classic': 'Klassiker',
+      'taste.tag.veg': 'Vegetarisch',
+      'taste.tag.sweet': 'Süß',
+      'taste.t1.desc': 'Hähnchenbrust, Gouda, Burger Sauce, Rotweinzwiebeljam, Tomate, Gurke, Salat — auf hausgebackenem Burger Bun.',
+      'taste.t2.desc': 'Blattsalat, Duftreis, Brokkoli, Sesam, Gurke, Paprika, Karotte und Avocado — knackfrisch & vor Ihren Augen zubereitet.',
+      'taste.t3.desc': 'Hähnchenbruststreifen, Teriyaki Sauce, Ingwer, Frühlingslauch, Zucchini und Paprika — kreativ und voller Geschmack.',
+      'taste.t4.name': 'Sandwich French Toast',
+      'taste.t4.desc': 'In Ei gebackenes Toastbrot, Blattsalat, Tomate, Hähnchenbruststreifen und Aprikosen-Schnittlauch-Dressing.',
+      'taste.t5.name': 'Ofenkartoffel Teriyaki',
+      'taste.t5.desc': 'Knusprige Ofenkartoffel mit Teriyaki Hähnchen oder klassisch mit Kräuterquark (8,90 €) — von würzig bis raffiniert.',
+      'taste.t6.name': 'Sächsische Quarkkeulchen',
+      'taste.t6.desc': 'Traditionelle Quarkkeulchen mit hausgemachtem Apfelmus — wie bei Großmuttern, mit erlesenen frischen Zutaten ohne Zusatzstoffe.',
+
+      'menu.eyebrow': 'Komplette Speisekarte',
+      'menu.title': 'Aus unserer <em>Küche</em>.',
+      'menu.sub': 'Eine Auswahl unserer Lieblinge — Wraps, Pasta, Burger, Bowls und mehr. Alle Preise in Euro inkl. MwSt. Stand 01/2024.',
+      'menu.tab.wraps': 'Wraps & Sandwiches',
+      'menu.tab.bowls': 'Bowls & Salate',
+      'menu.tab.pasta': 'Pasta',
+      'menu.tab.burger': 'Burger',
+      'menu.tab.potato': 'Ofenkartoffeln',
+      'menu.tab.dessert': 'Dessert',
+      'menu.fullpdf': 'Komplette Speisekarte (PDF)',
+      'dish.spicy': 'Scharf',
+
+      'brunch.eyebrow': 'Schlemmerbrunch',
+      'brunch.title': 'Jeden Sonntag von <em>10–14 Uhr</em>.',
+      'brunch.h3': 'Für unsere <em>Langschläfer</em>.',
+      'brunch.p': 'Schlemmen Sie jeden Sonntag (und an ausgewählten Feiertagen) nach Lust und Laune soviel und sooft Sie mögen. Ab 12 Uhr werden warme Speisen angeboten.',
+      'brunch.unit': '€ pro Person · inkl. Säfte · Kinder 7–12 J. 10,90 €',
+      'brunch.info1': 'Sonntags 10:00 – 14:00 Uhr · An Feiertagen 32,90 €',
+      'brunch.info2': 'Reservierung mind. 48h vorher: 0341 / 960 19 79',
+      'brunch.cta': 'Jetzt reservieren',
+
+      'res.eyebrow': 'Reservierung',
+      'res.h3': 'Wir freuen uns auf <em style="font-family:\'Caveat\',cursive;color:var(--red);font-style:normal">Ihren Besuch</em>.',
+      'res.p': 'Über unser Reservierungsformular haben Sie die Möglichkeit, online einen Platz in unserem Restaurant zu reservieren. An Stoßzeiten bitten wir um etwas Geduld.',
+      'res.address': 'Adresse',
+      'res.hours': 'Öffnungszeiten',
+      'res.hours.value': 'Mo–Sa 9:00–22:00 · So 10:00–21:00',
+      'res.phone': 'Telefon',
+      'res.email': 'E-Mail',
+
+      'form.title': 'Tisch reservieren',
+      'form.name': 'Name',
+      'form.name.ph': 'Ihr Name',
+      'form.phone': 'Telefon',
+      'form.phone.ph': 'Ihre Nummer',
+      'form.email': 'E-Mail',
+      'form.email.ph': 'Ihre E-Mail-Adresse',
+      'form.date': 'Datum',
+      'form.time': 'Uhrzeit',
+      'form.people': 'Personen',
+      'form.people.1': '1 Person',
+      'form.people.2': '2 Personen',
+      'form.people.3': '3 Personen',
+      'form.people.4': '4 Personen',
+      'form.people.5': '5+ Personen',
+      'form.occasion': 'Anlass',
+      'form.oc.lunch': 'Mittagessen',
+      'form.oc.dinner': 'Abendessen',
+      'form.oc.brunch': 'Brunch',
+      'form.oc.birthday': 'Geburtstag',
+      'form.oc.other': 'Sonstiges',
+      'form.message': 'Nachricht (optional)',
+      'form.message.ph': 'Besondere Wünsche oder Anmerkungen',
+      'form.submit': 'Reservierung anfragen →',
+
+      'foot.tagline': 'Eiscafé · Bar · Restaurant im Herzen von Leipzig. Tradition seit 1964 — frische Küche, hausgemachte Torten und mehr als 30 Sorten Kugeleis.',
+      'foot.explore': 'Erkunden',
+      'foot.story': 'Unsere Geschichte',
+      'foot.menu': 'Speisekarte',
+      'foot.ice': 'Eiscafé',
+      'foot.brunch': 'Brunch',
+      'foot.reserve': 'Reservierung',
+      'foot.visit': 'Besuchen',
+      'foot.hours': 'Mo–Sa: 9:00–22:00<br>Sonntags: 10:00–21:00',
+      'foot.contact': 'Kontakt',
+      'foot.copy': '© 2011 – 2026 Milchbar Pinguin · Alle Rechte vorbehalten',
+      'penguin.aria': 'Reservieren'
+    }
+  };
+
+  function setLang(lang) {
+    if (!translations[lang]) return;
+    const dict = translations[lang];
+
+    // text/html content
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      if (dict[key] === undefined) return;
+      if (el.hasAttribute('data-i18n-html')) el.innerHTML = dict[key];
+      else el.textContent = dict[key];
+    });
+
+    // placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.dataset.i18nPlaceholder;
+      if (dict[key] !== undefined) el.setAttribute('placeholder', dict[key]);
+    });
+
+    // aria-labels
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+      const key = el.dataset.i18nAria;
+      if (dict[key] !== undefined) el.setAttribute('aria-label', dict[key]);
+    });
+
+    // update <html lang>
+    document.documentElement.lang = lang;
+
+    // update toggle state
+    document.querySelectorAll('.lang-toggle button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+
+    // persist
+    try { localStorage.setItem('mp_lang', lang); } catch (e) {}
+  }
+
+  // wire up buttons
+  document.querySelectorAll('.lang-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => setLang(btn.dataset.lang));
+  });
+
+  // restore saved / detect browser language on load
+  (function initLang() {
+    let saved = null;
+    try { saved = localStorage.getItem('mp_lang'); } catch (e) {}
+    if (saved && translations[saved]) { setLang(saved); return; }
+    const browserLang = (navigator.language || 'de').toLowerCase().slice(0, 2);
+    if (browserLang === 'en') setLang('en');
+    // otherwise stay German (default)
+  })();
+
+  // ============ PRODUCT IMAGES → SPEISEKARTE PDF ============
+  const PDF_URL = 'https://www.milch-bar-pinguin.de/wp-content/uploads/2024/02/MP-Speisekarte2024.pdf';
+  const productSelectors = [
+    '.float-card',
+    '.cat-card',
+    '.ice-img',
+    '.taste-img',
+    '.brunch-image',
+    '.story-img-main',
+    '.story-img-accent'
+  ];
+  const labelHTML = `
+    <span class="menu-hover-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      <span data-i18n="nav.menu">Speisekarte</span>
+    </span>`;
+  productSelectors.forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      el.classList.add('menu-clickable');
+      el.insertAdjacentHTML('beforeend', labelHTML);
+      el.addEventListener('click', e => {
+        // don't intercept clicks on existing links inside (like cat-link)
+        if (e.target.closest('.cat-link') || e.target.closest('a')) return;
+        window.open(PDF_URL, '_blank', 'noopener');
+      });
+    });
+  });
+
+  // Re-apply current language so dynamically-inserted labels are translated
+  setLang(document.documentElement.lang || 'de');
+</script>
+
+</body>
+</html>
